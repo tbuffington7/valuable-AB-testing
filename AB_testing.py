@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 from scipy import stats
 from copy import deepcopy
+import matplotlib as mpl
 
 
 class Advertisement:
@@ -139,8 +140,10 @@ class Advertisement:
         x = np.linspace(0, .2, 1000)
         plt.fill(self.calc_conversion_value(x), stats.beta(a=self.alpha, b=self.beta).pdf(x), alpha=0.4, color=color,
                  edgecolor='k')
-        plt.xlabel('Revenue (thousands of dollars)')
+        plt.xlabel('Revenue')
         plt.ylabel("Probability density")
+        ax = plt.gca()
+        ax.xaxis.set_major_formatter(mpl.ticker.StrMethodFormatter('${x:,.0f}'))
 
 
 def get_overall_value(A, B):
@@ -219,7 +222,7 @@ def simulate_test(A, B, test_sample_size=1000, verbose=False, update_objects=Fal
     return overall_value
 
 
-def calc_voi(A, B, test_sample_size=1000, num_iter=5000):
+def calc_voi(A, B, test_sample_size=1000, num_iter=10000):
     """
     Calculates the value of information (VoI) for a particular A/B test. This is done simulating the results from many
     A/B tests. Using those results to update our beliefs about the underlying conversion rates, and then choosing the
