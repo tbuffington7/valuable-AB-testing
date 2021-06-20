@@ -6,7 +6,7 @@ from copy import deepcopy
 import matplotlib as mpl
 
 
-class Advertisement:
+class Product:
     """
     Class for holding relevant attributes and functions for an advertisement to be A/B tested.
 
@@ -168,7 +168,7 @@ def get_overall_value(A, B):
     return overall_value
 
 
-def simulate_test(A, B, test_sample_size=1000, verbose=False, update_objects=False):
+def simulate_test(A, B, test_sample_size=1000, verbose=False, update_beliefs=False):
     """
     Simulates an A/B test, and then returns the expected value/revenue of the lottery after
     updating beliefs with the test results.
@@ -183,7 +183,7 @@ def simulate_test(A, B, test_sample_size=1000, verbose=False, update_objects=Fal
         The number of ad interactions
     verbose: bool
         Whether to print information about the test
-    update_objects: bool
+    update_beliefs: bool
         Whether to update the inputted Advertisements in place    
     
     Returns
@@ -197,7 +197,7 @@ def simulate_test(A, B, test_sample_size=1000, verbose=False, update_objects=Fal
     num_B_interactions = B.get_test_data(test_sample_size)
 
     # These results update our beliefs (the beta distributions) of the advertisement objects
-    if update_objects:
+    if update_beliefs:
         # If we want to update the input objects, then just do shallow copies
         A_updated = A
         B_updated = B
