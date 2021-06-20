@@ -6,32 +6,32 @@ from copy import deepcopy
 import matplotlib as mpl
 
 
-class Product:
+class Variant:
     """
-    Class for holding relevant attributes and functions for an advertisement to be A/B tested.
+    Class for holding relevant attributes and functions for a variant to be A/B tested.
 
     Attributes:
     ----------
     alpha: float
-        The \alpha parameter in the advertisement's beta distribution for conversion rate
+        The \alpha parameter in the variant's beta distribution for conversion rate
     beta: float
-        The \beta parameter in the advertisement's beta distribution for conversion rate
+        The \beta parameter in the variant's beta distribution for conversion rate
     value_function: func
         A function that takes in a conversion rate as an input and outputs a monetary value
     expected_value:
-        The expected revenue of the advertisement computed by averaging over all of its potential conversion rates
+        The expected revenue of the variant computed by averaging over all of its potential conversion rates
     """
 
     def __init__(self, alpha, beta, conversion_rate_value):
         """
-        Initializes the Advertisement class
+        Initializes the Variant class
 
         Parameters:
         ----------
         alpha: float
-            The \alpha parameter in the advertisement's beta distribution for conversion rate
+            The \alpha parameter in the variant's beta distribution for conversion rate
         beta: float
-            The \beta parameter in the advertisement's beta distribution for conversion rate
+            The \beta parameter in the variant's beta distribution for conversion rate
         conversion_rate_value: float:
             The expected value (in thousands of dollars per %) of an ad based on its conversion rate
         """
@@ -95,7 +95,7 @@ class Product:
         Returns
         -------
         conversion_rate_value: float
-            The monetary value of an advertisement with a specified conversion rate
+            The monetary value of an variant with a specified conversion rate
 
         """
         conversion_rate_value = conversion_rate * self.conversion_rate_value * 100
@@ -104,7 +104,7 @@ class Product:
 
     def calc_expected_value(self):
         """
-        Computes the mean expected value/revenue of a given advertisement.
+        Computes the mean expected value/revenue of a given variant.
 
         """
 
@@ -130,7 +130,7 @@ class Product:
 
     def plot_value_dist(self, color):
         """
-        A helpful function for making plots of the advertisement's monetary value
+        A helpful function for making plots of the variant's monetary value
 
         Parameters
         ----------
@@ -152,15 +152,15 @@ def get_overall_value(A, B):
 
     Parameters
     ----------
-    A: Advertisement object
+    A: Variant object
         The first option in the A/B test
-    B: Advertisement object
+    B: Variant object
         The second option in the A/B test
 
     Returns
     -------
     overall_value: float
-        The overall value calculated by choosing the advertisement (between A and B) that has a higher expected
+        The overall value calculated by choosing the variant (between A and B) that has a higher expected
         conversion rate.
 
     """
@@ -175,16 +175,16 @@ def simulate_test(A, B, test_sample_size=1000, verbose=False, update_beliefs=Fal
     
     Parameters
     ----------
-    A: Advertisement object
+    A: Variant object
         The first option in the A/B test
-    B: Advertisement object
+    B: Variant object
         The second option in the A/B test
     test_sample_size: int
         The number of ad interactions
     verbose: bool
         Whether to print information about the test
     update_beliefs: bool
-        Whether to update the inputted Advertisements in place    
+        Whether to update the inputted Variants in place    
     
     Returns
     -------
@@ -196,7 +196,7 @@ def simulate_test(A, B, test_sample_size=1000, verbose=False, update_beliefs=Fal
     num_A_interactions = A.get_test_data(test_sample_size)
     num_B_interactions = B.get_test_data(test_sample_size)
 
-    # These results update our beliefs (the beta distributions) of the advertisement objects
+    # These results update our beliefs (the beta distributions) of the variant objects
     if update_beliefs:
         # If we want to update the input objects, then just do shallow copies
         A_updated = A
@@ -213,8 +213,8 @@ def simulate_test(A, B, test_sample_size=1000, verbose=False, update_beliefs=Fal
     overall_value = get_overall_value(A_updated, B_updated)
 
     if verbose:
-        print(f"Advertisement A: {num_A_interactions} conversions out of {test_sample_size}")
-        print(f"Advertisement B: {num_B_interactions} conversions out of {test_sample_size}")
+        print(f"Variant A: {num_A_interactions} conversions out of {test_sample_size}")
+        print(f"Variant B: {num_B_interactions} conversions out of {test_sample_size}")
         if A_updated.expected_value > B_updated.expected_value:
             print("A appears to be the better option")
         else:
@@ -230,12 +230,12 @@ def calc_voi(A, B, test_sample_size=1000, num_iter=10000):
 
     Parameters
     ----------
-    A: Advertisement object
+    A: Variant object
         The first option in the A/B test
-    B: Advertisement object
+    B: Variant object
         The second option in the A/B test
     test_sample_size: int
-        The number of ad interactions for each advertisement in the test
+        The number of ad interactions for each variant in the test
     num_iter: int
         The number of A/B tests to simulate
 
@@ -266,9 +266,9 @@ def calc_voc(A, B, num_steps=10000):
 
     Parameters
     ----------
-    A: Advertisement object
+    A: Variant object
         The first option in the A/B test
-    B: Advertisement object
+    B: Variant object
         The second option in the A/B test
     num_steps: int
         The number of steps to discretize the pdfs into for convolution
