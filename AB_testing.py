@@ -138,7 +138,8 @@ class Variant:
             A color for the distribution
         """
         x = np.linspace(0, .2, 1000)
-        plt.fill(self.calc_conversion_value(x), stats.beta(a=self.alpha, b=self.beta).pdf(x), alpha=0.4, color=color,
+        plt.fill(self.calc_conversion_value(x), stats.beta(a=self.alpha, b=self.beta).pdf(x) /
+                 (self.conversion_rate_value * 100), alpha=0.4, color=color,
                  edgecolor='k')
         plt.xlabel('Revenue')
         plt.ylabel("Probability density")
@@ -146,7 +147,7 @@ class Variant:
         ax.xaxis.set_major_formatter(mpl.ticker.StrMethodFormatter('${x:,.0f}'))
 
 
-def get_overall_value(A, B):
+def get_decision_value(A, B):
     """
     When faced with a decision between lottery A and lottery B, the overall value is the value of the greater lottery.
 
@@ -159,13 +160,12 @@ def get_overall_value(A, B):
 
     Returns
     -------
-    overall_value: float
-        The overall value calculated by choosing the variant (between A and B) that has a higher expected
-        conversion rate.
+    decision_value: float
+        The value of the decision situation when faced with a decision between Variant A and Variant B
 
     """
-    overall_value = max(A.expected_value, B.expected_value)
-    return overall_value
+    decision_value = max(A.expected_value, B.expected_value)
+    return decision_value
 
 
 def simulate_test(A, B, test_sample_size=1000, verbose=False, update_beliefs=False):
@@ -188,8 +188,8 @@ def simulate_test(A, B, test_sample_size=1000, verbose=False, update_beliefs=Fal
     
     Returns
     -------
-    overall_value: float
-        The expected value of the option that appears better after obtaining A/B test results
+    decision_value: float
+        The value of the decision situation after updating the beliefs with an A/B test
     """
 
     # Simulate test results by drawing from our priors
@@ -210,7 +210,7 @@ def simulate_test(A, B, test_sample_size=1000, verbose=False, update_beliefs=Fal
     B_updated.update_beliefs(test_sample_size, num_B_interactions)
 
     # After the test, we can pick the option that appears better
-    overall_value = get_overall_value(A_updated, B_updated)
+    decision_value = get_decision_value(A_updated, B_updated)
 
     if verbose:
         print(f"Variant A: {num_A_interactions} conversions out of {test_sample_size}")
@@ -219,7 +219,37 @@ def simulate_test(A, B, test_sample_size=1000, verbose=False, update_beliefs=Fal
             print("A appears to be the better option")
         else:
             print("B appears to be the better option")
-    return overall_value
+    return decision_value
+
+
+def monte_carlo(A, B, test_sample_size=1000, num_iter=10000):
+    """
+    This function simulates num_iter A/B tests and returns the values of the resulting decision situations in an
+    array.
+
+    Parameters
+    ----------
+    A: Variant object
+        The first option in the A/B test
+    B: Variant object
+        The second option in the A/B test
+    test_sample_size: int
+        The number of ad interactions for each variant in the test
+    num_iter: int
+        The number of A/B tests to simulate
+
+    Returns
+    -------
+    value_array: np.array
+        An array of monte carlo results
+    """
+
+    # This array holds monetary values of the lottery after getting simulated test results
+    value_array = np.zeros(num_iter)
+    for i in tqdm(range(num_iter)):
+        value_array[i] = simulate_test(A, B, test_sample_size=test_sample_size)
+
+    return value_array
 
 
 def calc_voi(A, B, test_sample_size=1000, num_iter=10000):
@@ -245,13 +275,11 @@ def calc_voi(A, B, test_sample_size=1000, num_iter=10000):
         The monetary value of the potential A/B test
     """
 
-    # This array holds monetary values of the lottery after getting simulated test results
-    value_array = np.zeros(num_iter)
-    for i in tqdm(range(num_iter)):
-        value_array[i] = simulate_test(A, B, test_sample_size=test_sample_size)
+    value_array = monte_carlo(A, B, test_sample_size, num_iter)
 
-    # The VoI is the difference between the average value of all the simulated values and the current expected value
-    value_of_information = np.mean(value_array) - get_overall_value(A, B)
+    # If risk neutral, the VoI is the difference between the average value of all the simulated values and
+    # the current expected value.
+    value_of_information = np.mean(value_array) - get_decision_value(A, B)
 
     # VOI cannot be negative. It is possible to get a small negative value here due to noise
     value_of_information = max(value_of_information, 0)
