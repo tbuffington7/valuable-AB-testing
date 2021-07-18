@@ -16,11 +16,13 @@ To calculate the value of a test, you must first specify:
 3. The value of each % conversion rate, i.e. how much would you pay for a variant with a (X+1)% conversion rate over one with a X% conversion rate?
 
 For example:
-`alpha = 4
+```
+alpha = 4
 beta = 100
 conversion_rate_value = 10000
 
 A = Variant(alpha, beta, conversion_rate_value)
-B = Variant(alpha, beta, conversion_rate_value)`
+B = Variant(alpha, beta, conversion_rate_value)
+```
 
 
