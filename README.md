@@ -3,6 +3,8 @@
 ## Overview
 This is a personal project of mine that aims to answer the question, "How much is an A/B test worth?" The framework is based on the [value of information](https://en.wikipedia.org/wiki/Value_of_information). This repo is also used for the analyses used in my blog post, [Quantifying the value of an A/B test](https://towardsdatascience.com/quantifying-the-value-of-an-a-b-test-821aecfd2ef), which is published in Towards Data Science on Medium. The plots used in the blog post were created using AB_testing_notebook.ipynb. Note the plots are somewhat ad hoc as they are meant to be illustrative examples of the concepts discussed in the post. 
 
+Currently the repo allows one to compute the value of an A/B test for a conversion rate. This lends itself to a Beta/Binomial model. 
+
 ## Prerequisites
 As always, it is recommended that you use a virtual environment for this repo. After creating a virual environment, the dependencies can be installed via the requirements file:
 
@@ -19,10 +21,16 @@ For example:
 ```
 alpha = 4
 beta = 100
-conversion_rate_value = 10000
+conversion_rate_value = 10000 # USD/% conversion rate
 
 A = Variant(alpha, beta, conversion_rate_value)
 B = Variant(alpha, beta, conversion_rate_value)
 ```
+
+Note that although the two variants have the same prior in this example, you can specify different priors for the two variants. 
+
+After instantating the `Variant` objects, you can compute the value of an A/B test with, for example, 100 participants (for each variant) like this:
+`voi = calc_voi(A, B, test_sample_size=100)`
+
 
 
