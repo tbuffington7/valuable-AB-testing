@@ -1,7 +1,13 @@
 # valuable-AB-testing
 
+## February 2024 update
+I have gained a lot of experience with A/B testing in the last few years since doing this project. Although I think the VoI framework is sound, there are a few practical issues that I would like to address in the future.
+- This repo places priors on both variants _separately_, which I believe leads to the [Bayesian imposter](https://www.geteppo.com/blog/beware-of-the-bayesian-imposter).
+- It would be better to place priors on the relative lift.
+- Because the priors are not optimally specified, the repo recommends sample sizes that are laughably small. When I have bandwidth, I plan to update this repo so it uses more realistic priors, which should generate more realistic sample size recommendations.
+
 ## Overview
-This is a personal project of mine that aims to answer the question, "How much is an A/B test worth?" The framework is based on the [value of information](https://en.wikipedia.org/wiki/Value_of_information). This repo is also used for the analyses used in my blog post, [Quantifying the value of an A/B test](https://towardsdatascience.com/quantifying-the-value-of-an-a-b-test-821aecfd2ef), which is published in Towards Data Science on Medium. The plots used in the blog post were created using AB_testing_notebook.ipynb. Note the plots are somewhat ad hoc as they are meant to be illustrative examples of the concepts discussed in the post. 
+This is a personal project of mine that aims to answer the question, "How much is an A/B test worth?" The framework is based on the [value of information](https://en.wikipedia.org/wiki/Value_of_information).
 
 Currently the repo allows one to compute the value of an A/B test for a conversion rate. This lends itself to a Beta/Binomial model. 
 
